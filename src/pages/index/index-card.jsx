@@ -18,7 +18,7 @@ import axios from 'axios'
 import {Store} from '../../async'
 import { useRecordWebcam } from 'react-record-webcam'
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-const STRAPI_ENDPOINT = 'http://18.217.254.80:1337/';
+const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
 const socket = io(STRAPI_ENDPOINT);
 
 const CustomRadio = withStyles({

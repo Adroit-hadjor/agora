@@ -8,7 +8,7 @@ import RTCClient from '../rtc-client'
 import Tooltip from '@material-ui/core/Tooltip'
 import LiveTvIcon from '@material-ui/icons/LiveTv';
 import CircularProgress from '@material-ui/core/CircularProgress'
-
+import {Put} from '../api'
 import StreamPlayer from './meeting/stream-player'
 import io from "socket.io-client";
 import { List,InfiniteLoader } from "react-virtualized";
@@ -25,7 +25,7 @@ import ScrollableFeed from 'react-scrollable-feed'
 import { Button } from '@material-ui/core'
 import { TvRounded } from '@material-ui/icons'
 
-const STRAPI_ENDPOINT = 'http://18.217.254.80:1337/';
+const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
 const socket = io(STRAPI_ENDPOINT);
 
 const useStyles = makeStyles({
@@ -153,7 +153,17 @@ socket.on('fire', (ch)=> {
     };
 },[counter])
 
-
+const send = async()=>{
+  const t ="21221"
+  const url = "tokens/1"
+  console.log("step 1")
+  const body = {
+     token:t
+  }
+  console.log("step 2")
+  const sa = await Put(url,body)
+ 
+}
 
 
 const record = async()=>{
@@ -443,6 +453,7 @@ const shutdown = () =>{
               onClick={() => { 
                    recordWebcam.download();
                    recordWebcam.close();
+                   send();
                    localClient.leave().then(() => {
                     
                   mutationCtx.clearAllStream()

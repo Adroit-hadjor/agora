@@ -8,7 +8,7 @@ import io from "socket.io-client";
 
 import Button from '@material-ui/core/Button'
 
-const STRAPI_ENDPOINT = 'http://18.217.254.80:1337/';
+const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
 const socket = io(STRAPI_ENDPOINT);
 
 const useStyles = makeStyles(() => ({
@@ -93,7 +93,7 @@ const Upload = () => {
     }
     
     var body=JSON.stringify(bo)
-    const response = await fetch(`http://18.217.254.80:1337/youtubes/`+1, {
+    const response = await fetch(`http://18.188.190.182:1337/youtubes/`+1, {
       method: 'PUT',
       headers: {
            
@@ -111,7 +111,7 @@ const Upload = () => {
     }
     
     var body=JSON.stringify(bo)
-    const response = await fetch(`http://18.217.254.80:1337/videos/`, {
+    const response = await fetch(`http://18.188.190.182:1337/videos/`, {
       method: 'POST',
       headers: {
            
@@ -136,7 +136,7 @@ if(data.id > 0){
     formData.append('field', 'video') // optional, you need it if you want to link the image to an entry
     //data.append('source', 'users-permissions');y
       console.log(formData)
-     const ss = await axios.post('http://18.217.254.80:1337/upload', formData , {headers: {'Content-Type': 'multipart/form-data'}}) 
+     const ss = await axios.post('http://18.188.190.182:1337/upload', formData , {headers: {'Content-Type': 'multipart/form-data'}}) 
    
     }
 
@@ -151,7 +151,7 @@ if(data.id > 0){
 
   useEffect(()=>{
     const fetchVideos=async()=>{
-      await axios.get('http://18.217.254.80:1337/videos').then((response)=>{
+      await axios.get('http://18.188.190.182:1337/videos').then((response)=>{
         if(response){
             setAllVids(response.data)
             console.log(response.data)
@@ -187,7 +187,7 @@ if(data.id > 0){
 </div>
 <Button 
 onClick={async ()=>{
-  await axios.delete('http://18.217.254.80:1337/videos/'+vids.id)
+  await axios.delete('http://18.188.190.182:1337/videos/'+vids.id)
   .then((res)=>{
     if(res){
       window.location.href='/upload'

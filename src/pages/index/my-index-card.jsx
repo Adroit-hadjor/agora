@@ -163,7 +163,7 @@ export default function IndexCard () {
 
     if(pastor){
 
-      await axios.post('http://18.217.254.80:1337/auth/local', {
+      await axios.post('http://18.188.190.182:1337/auth/local', {
       identifier: name,
       password: password,
     })
@@ -184,7 +184,7 @@ export default function IndexCard () {
         return
     }
     if (vmix){
-      await axios.post('http://18.217.254.80:1337/auth/local', {
+      await axios.post('http://18.188.190.182:1337/auth/local', {
         identifier: name,
         password: password,
       })
@@ -295,15 +295,8 @@ export default function IndexCard () {
   }
 
   const send = async(token)=>{
-  
-    const url = "tokens/1"
-    const body = {
-       token:token
-    }
-    const sa = await Put(url,body)
+  console.log("sdsd")
    
-
-
   }
   const recordWebcam = useRecordWebcam();
 
