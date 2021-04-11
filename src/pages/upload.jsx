@@ -83,6 +83,10 @@ const Upload = () => {
     socket.on('start', (start) => {
       console.log(start.start)
     })
+
+    return () => {
+      socket.off('start')
+    }
   }, [])
 
   const YSubmit = async (e) => {
@@ -157,6 +161,10 @@ const Upload = () => {
       )
     }
     fetchVideos()
+
+    return () => {
+
+    }
   }, [])
 
   return (
