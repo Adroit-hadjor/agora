@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import { useGlobalState, useGlobalMutation } from '../../utils/container'
@@ -10,16 +10,16 @@ import Button from '@material-ui/core/Button'
 import useRouter from '../../utils/use-router'
 import { Link } from 'react-router-dom'
 import AgoraRTC from 'agora-rtc-sdk'
-import {Post,Put} from '../../api'
+import { Post, Put, REACT_APP_API_URL } from '../../api'
 
-import io from "socket.io-client";
+import io from 'socket.io-client'
 
 import axios from 'axios'
-import {Store} from '../../async'
+import { Store } from '../../async'
 import { useRecordWebcam } from 'react-record-webcam'
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-const STRAPI_ENDPOINT = 'http://18.217.254.80:1337/';
-const socket = io(STRAPI_ENDPOINT);
+const { RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole } = require('agora-access-token')
+
+const socket = io(REACT_APP_API_URL)
 
 const CustomRadio = withStyles({
   root: {
@@ -131,202 +131,177 @@ const useStyles = makeStyles((theme) => ({
 
 export default function IndexCards () {
   const classes = useStyles()
- const [toke,setToke] = useState("")
- const [name,setName] = useState("")
- const [refId,setRefId] = useState("")
+  const [toke, setToke] = useState('')
+  const [name, setName] = useState('')
+  const [refId, setRefId] = useState('')
   const routerCtx = useRouter()
   const stateCtx = useGlobalState()
   const mutationCtx = useGlobalMutation()
- const [count,setCount]= useState(0)
+  const [count, setCount] = useState(0)
   const handleClick = () => {
-    let start='Live Stream Alert'
-    socket.emit('startlive',{start})
+    const start = name
+    socket.emit('startlive', { start })
 
-
-    if(!name){
-      alert("Input title please")
+    if (!name) {
+      alert('Input title please')
       return
     }
-   // recordWebcam.open();
-    sendTitle();
-     
-   
-    if(toke){
-      
+    // recordWebcam.open();
+    sendTitle()
+
+    if (toke) {
+      console.log('Token Exists')
+
       mutationCtx.startLoading()
       mutationCtx.updateConfig({
-     
-        token: toke,
+
+        token: toke
       })
       routerCtx.history.push({
-        pathname: `/meeting/casa`
-      }) 
-    }  
-  
+        pathname: '/meeting/casa'
+      })
+    }
   }
 
-
-  const sendTitle =async() =>{
-   
-   const ah = await Store("title",name)
+  const sendTitle = async () => {
+    const ah = await Store('title', name)
   }
 
   const handleChange = (evt) => {
     const { value, checked } = evt
     console.log('value', evt)
     mutationCtx.updateConfig({
-      host: value === 'host',
-     
+      host: value === 'host'
+
     })
-   
   }
 
-  useEffect(()=>{
-    const toker = "token"
-    socket.emit('token',{toker},(error)=>{
-
-      if(error){
+  useEffect(() => {
+    const toker = 'token'
+    socket.emit('token', { toker }, (error) => {
+      if (error) {
         console.log(error)
-
-      }else{
-        console.log("kkkjkjk")
-
+      } else {
+        console.log('kkkjkjk')
       }
-
     }
     )
-  },[count])
+  }, [count])
 
-  socket.on('getToken',(ch)=>{
-    console.log("tokeeen")
-    setToke(ch)
-    console.log("tokeeen")
-    console.log(ch)
-    const saveToken = async() =>{ localStorage.setItem("token",ch)}
-    const c = async()=> {await send(ch)}
-    c();
-  })
+  useEffect(() => {
+    socket.on('getToken', (ch) => {
+      console.log('tokeeen')
+      setToke(ch)
+      console.log('tokeeen')
+      console.log(ch)
+      const saveToken = async () => { localStorage.setItem('token', ch) }
+      const c = async () => { await send(ch) }
+      c()
+    })
+  }, [])
 
-  const getResourceId =async()=>{
-   
-    const cust_id ="98b9f5d2847a4605a8ab0a401993a750"
-    const secret ="0dade57ed94546f4abf8d0b040a84723"
-    const stringer = cust_id +":"+secret
+  const getResourceId = async () => {
+    const custId = '98b9f5d2847a4605a8ab0a401993a750'
+    const secret = '0dade57ed94546f4abf8d0b040a84723'
+    const stringer = custId + ':' + secret
     const encodedCredential = Buffer.from(stringer).toString('base64')
-    const Authorization = "Basic " + encodedCredential
+    const Authorization = 'Basic ' + encodedCredential
 
-    const appID = process.env.REACT_APP_AGORA_APP_ID;
-    console.log(" resourcebraaaaaaaaaaa ")
+    const appID = process.env.REACT_APP_AGORA_APP_ID
+    console.log(' resourcebraaaaaaaaaaa ')
     const acquire = await axios.post(
       `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,
       {
-        cname: "casa",
-        uid: "1",
-      
-       clientRequest: {
-        
-        resourceExpiredHour: 24,
+        cname: 'casa',
+        uid: '1',
+
+        clientRequest: {
+
+          resourceExpiredHour: 24
+        }
       },
-      },
-      { headers: { Authorization : Authorization},
-     
-    }
-    );
-    console.log("res is "+acquire.data.resourceId )
-    const mode="mix"
-    var waitTill = new Date(new Date().getTime() + 5 * 1000);
-  /*   while(waitTill > new Date()){
-     
+      { headers: { Authorization: Authorization } }
+    )
+    console.log('res is ' + acquire.data.resourceId)
+    const mode = 'mix'
+    var waitTill = new Date(new Date().getTime() + 5 * 1000)
+    /*   while(waitTill > new Date()){
+
       console.log(JSON.stringify(start))
     } */
-    
-  console.log("res is "+acquire.data.resourceId )
-    const save = await Store("resourceId", acquire.data.resourceId)
-  
+
+    console.log('res is ' + acquire.data.resourceId)
+    const save = await Store('resourceId', acquire.data.resourceId)
   }
 
-
-  const createToken = () =>{
-    const start = "token"
-
-   
- 
-   
-  
+  const createToken = () => {
+    const start = 'token'
   }
 
-  const send = async(token)=>{
-  
-    const url = "tokens/1"
+  const send = async (token) => {
+    const url = 'tokens/1'
     const body = {
-       token:token
+      token: token
     }
-    console.log("token is " + token)
-    const sa = await Put(url,body)
-   
-
-
+    console.log('token is ' + token)
+    const sa = await Put(url, body)
   }
-  const recordWebcam = useRecordWebcam();
+  const recordWebcam = useRecordWebcam()
 
   return (
-  <>
-    
+    <>
 
-    <Box
-      marginTop="114px"
-      flex="1"
-      display="flex"
-      alignItems="center"
-      justifyContent="flex-start"
-      flexDirection="column"
-    >
-      <Link to="/setting" className="setting-btn" />
-      
-      <a
-        href="https://github.com/AgoraIO/Basic-Video-Broadcasting/tree/master/OpenLive-Web"
-        className="github"
-      ></a>
-      <div className="role-container">
-        <CustomRadio
-          className={classes.radio}
-          value="host"
-          checked={stateCtx.config.host}
-          onClick={handleChange}
-        ></CustomRadio>
-       
-      </div>
       <Box
-        marginTop="92"
+        marginTop="114px"
         flex="1"
         display="flex"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="flex-start"
         flexDirection="column"
       >
-        <FormControl className={clsx(classes.input, classes.grid)}>
-         <Input 
-         placeholder="Enter Title Here"
-            value={name}
-            onChange={(evt) => {
+        <Link to="/setting" className="setting-btn" />
 
-              setName(evt.target.value)
-             
-            
-            }} />
-        </FormControl>
-        <FormControl className={classes.grid}>
-          <Button
-            onClick={()=>{handleClick();}}
-            variant="contained"
-            color="primary"
-            className={classes.button}
-          >
+        <a
+          href="https://github.com/AgoraIO/Basic-Video-Broadcasting/tree/master/OpenLive-Web"
+          className="github"
+        ></a>
+        <div className="role-container">
+          <CustomRadio
+            className={classes.radio}
+            value="host"
+            checked={stateCtx.config.host}
+            onClick={handleChange}
+          ></CustomRadio>
+
+        </div>
+        <Box
+          marginTop="92"
+          flex="1"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          flexDirection="column"
+        >
+          <FormControl className={clsx(classes.input, classes.grid)}>
+            <Input
+              placeholder="Enter Title Here"
+              value={name}
+              onChange={(evt) => {
+                setName(evt.target.value)
+              }} />
+          </FormControl>
+          <FormControl className={classes.grid}>
+            <Button
+              onClick={() => { handleClick() }}
+              variant="contained"
+              color="primary"
+              className={classes.button}
+            >
             Start Live Streaming
-          </Button>
-        </FormControl>
+            </Button>
+          </FormControl>
+        </Box>
       </Box>
-    </Box>
     </>
   )
 }
