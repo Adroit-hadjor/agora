@@ -87,14 +87,14 @@ export default function MyCardPage () {
                 <Box textAlign="center" fontSize="h6.fontSize" className={classes.fontStyle}>Welcome to</Box>
                 <Box textAlign="center" fontWeight="fontWeightRegular" fontSize="h4.fontSize" className={classes.midItem}>SAM TV LIVE</Box>
                 {/* <Box textAlign="center" fontWeight="fontWeightRegular" className={classes.fontStyle} style={{color: "white", fontSize: "17px"}}>Agora Web SDK: {AgoraRTC.VERSION}</Box> */}
-             
+
               </div>
             </div>
           </div>
           <div className={classes.coverRight}>
             <Switch>
               <Route exact path="/" component={IndexCard}></Route>
-             
+
             </Switch>
           </div>
         </Box>

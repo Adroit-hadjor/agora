@@ -10,11 +10,11 @@ function App () {
   return (
     <BrowserRouterHook>
       <Switch>
-      <Route exact path="/upload" component={Upload}></Route>
+        <Route exact path="/upload" component={Upload}></Route>
         <Route exact path="/meeting/:name" component={Meeting}></Route>
-        <Route  path="/pastor" component={Index}></Route>
+        <Route path="/pastor" component={Index}></Route>
         <Route path="/" component={Main}></Route>
-       
+
       </Switch>
     </BrowserRouterHook>
   )

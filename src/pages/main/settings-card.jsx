@@ -12,7 +12,6 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Switch from '@material-ui/core/Switch'
 import { Link } from 'react-router-dom'
 
-
 SettingsCard.propTypes = {
   name: PropTypes.string,
   resolution: PropTypes.string,
