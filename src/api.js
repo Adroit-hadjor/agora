@@ -1,4 +1,4 @@
-export const REACT_APP_API_URL = 'http://46.101.110.236'
+export const REACT_APP_API_URL = 'https://46.101.110.236'
 
 export const Post = async (url, body, token) => {
   const link = `${REACT_APP_API_URL}` + '/' + url
