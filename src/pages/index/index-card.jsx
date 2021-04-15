@@ -10,16 +10,15 @@ import Button from '@material-ui/core/Button'
 import useRouter from '../../utils/use-router'
 import { Link } from 'react-router-dom'
 import AgoraRTC from 'agora-rtc-sdk'
-import {Post,Put} from '../../api'
-
+import {Post,Put, SendNotifications} from '../../api'
 import io from "socket.io-client";
-
+import {REACT_APP_API_URL} from './../../api'
 import axios from 'axios'
 import {Store} from '../../async'
 import { useRecordWebcam } from 'react-record-webcam'
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
-const socket = io(STRAPI_ENDPOINT);
+const testToken="dLKTDDwDLEACiCEZsjmb6C:APA91bGBbqnUd50zq0Yo78CwfHz37k2RLKI8jFkNAV1kV-GiFhufRzVvVHL23g6sVBlNaEVf8didJJubY5GDslSxHbuKdc_G77NDF0ULSedI7agTmCifeUf9lW9JhaTUv6eiJIoG_JuC"
+//const socket = io(REACT_APP_API_URL);
 
 const CustomRadio = withStyles({
   root: {
@@ -138,9 +137,40 @@ export default function IndexCards () {
   const stateCtx = useGlobalState()
   const mutationCtx = useGlobalMutation()
  const [count,setCount]= useState(0)
-  const handleClick = () => {
-    let start='Live Stream Alert'
-    socket.emit('startlive',{start})
+
+ //handle click
+
+
+  const handleClick = async() => {
+    let start=name
+   // socket.emit('startlive',{start})
+    // await SendNotifications(testToken,'SamTv is Live',name).then((response)=>{
+    //   if(response){
+    //     console.log('Showwww')
+    //   }
+    // }).catch((error)=>{
+    //     console.log('Super Herror',error.message)
+    //})
+//  var registrationToken = 'dLKTDDwDLEACiCEZsjmb6C:APA91bGBbqnUd50zq0Yo78CwfHz37k2RLKI8jFkNAV1kV-GiFhufRzVvVHL23g6sVBlNaEVf8didJJubY5GDslSxHbuKdc_G77NDF0ULSedI7agTmCifeUf9lW9JhaTUv6eiJIoG_JuC';
+
+//  var message = {
+//    notification: {
+//      title: name,
+//      body: 'Sam TV is Live'
+//    },
+//    token: registrationToken
+//  };
+ 
+//  // Send a message to the device corresponding to the provided
+//  // registration token.
+//  admin.messaging().send(message)
+//    .then((response) => {
+//      // Response is a message ID string.
+//      console.log('Successfully sent message:', response);
+//    })
+//    .catch((error) => {
+//      console.log('Error sending message:', error);
+//    });   
 
 
     if(!name){
@@ -148,20 +178,22 @@ export default function IndexCards () {
       return
     }
    // recordWebcam.open();
+   
     sendTitle();
      
-   
-    if(toke){
+    
       
-      mutationCtx.startLoading()
-      mutationCtx.updateConfig({
-     
-        token: toke,
-      })
-      routerCtx.history.push({
-        pathname: `/meeting/casa`
-      }) 
-    }  
+        if(toke){
+          
+          mutationCtx.startLoading()
+          mutationCtx.updateConfig({
+        
+            token: toke,
+          })
+          routerCtx.history.push({
+            pathname: `/meeting/casa`
+          }) 
+        }  
   
   }
 
@@ -182,40 +214,47 @@ export default function IndexCards () {
   }
 
   useEffect(()=>{
-    const toker = "token"
-    socket.emit('token',{toker},(error)=>{
-
-      if(error){
-        console.log(error)
-
-      }else{
-        console.log("kkkjkjk")
-
+    const getToken=async ()=>{
+    await fetch(`${REACT_APP_API_URL}/token/`, {
+      method: 'GET',
+      headers: {
+           
+          'Content-Type': 'application/json',
+      },
+    }).then((response)=>{
+      const rJ=async ()=>{
+        let res=await response.json()
+        console.log(res)
+        setToke(res.token)
       }
+      rJ()
+      console.log('succeeded')
+    }).catch((error)=>{
+      console.log('failed',error.message)
+    })
+  }
+  getToken()
+  },[])
 
-    }
-    )
-  },[count])
-
-  socket.on('getToken',(ch)=>{
-    console.log("tokeeen")
-    setToke(ch)
-    console.log("tokeeen")
-    console.log(ch)
-    const saveToken = async() =>{ localStorage.setItem("token",ch)}
-    const c = async()=> {await send(ch)}
-    c();
-  })
+  // socket.on('getToken',(ch)=>{
+  //   console.log("tokeeen")
+  //   setToke(ch)
+  //   console.log("tokeen")
+  //   console.log(ch)
+  //   const saveToken = async() =>{ localStorage.setItem("token",ch)}
+  //   const c = async()=> {await send(ch)}
+  //   c();
+  // })
 
   const getResourceId =async()=>{
    
-    const cust_id ="98b9f5d2847a4605a8ab0a401993a750"
+    const custId ="98b9f5d2847a4605a8ab0a401993a750"
     const secret ="0dade57ed94546f4abf8d0b040a84723"
-    const stringer = cust_id +":"+secret
+    const stringer = custId +":"+secret
     const encodedCredential = Buffer.from(stringer).toString('base64')
     const Authorization = "Basic " + encodedCredential
 
-    const appID = process.env.REACT_APP_AGORA_APP_ID;
+    const appID = 'c40594061e1f4580aae3b2af1963d01e'
     console.log(" resourcebraaaaaaaaaaa ")
     const acquire = await axios.post(
       `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,
@@ -317,7 +356,7 @@ export default function IndexCards () {
         </FormControl>
         <FormControl className={classes.grid}>
           <Button
-            onClick={()=>{handleClick();}}
+            onClick={handleClick}
             variant="contained"
             color="primary"
             className={classes.button}

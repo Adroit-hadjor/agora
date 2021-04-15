@@ -14,10 +14,10 @@ import AgoraRTC from 'agora-rtc-sdk'
 import {Post,Put} from '../../api'
 import axios from 'axios'
 import {Store} from '../../async'
+import {REACT_APP_API_URL} from './../../api'
 import { useRecordWebcam } from 'react-record-webcam'
 import { HashRouter as Router, Route, Switch,useHistory } from 'react-router-dom'
 const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-
 
 const CustomRadio = withStyles({
   root: {
@@ -160,49 +160,49 @@ export default function IndexCard () {
 
   const handleClick = async (e) => {
     e.preventDefault();
-
+    
     if(pastor){
 
-      await axios.post('http://18.188.190.182:1337/auth/local', {
-      identifier: name,
-      password: password,
-    })
-    .then(
-      (response)=>{
+    //   await axios.post(`${REACT_APP_API_URL}/auth/local`, {
+    //   identifier: name,
+    //   password: password,
+    // })
+    // .then(
+    //   (response)=>{
 
-        if(response.data.user.roles==='Pastor'){
+    //     if(response.data.user.roles==='Head Pastor'){
           history.push('/pastor'); 
-        }else{
-          setOpen(true)
-        }
+        // }else{
+        //   setOpen(true)
+        // }
        
-      }
-    )
-    .catch(
+    //   }
+    // )
+    // .catch(
 
-    );
-        return
+    // );
+    //     return
     }
     if (vmix){
-      await axios.post('http://18.188.190.182:1337/auth/local', {
-        identifier: name,
-        password: password,
-      })
-      .then(
-        (response)=>{
-          console.log(response.data)
-          if(response.data.user.roles==='Vmix Admin'){
+      // await axios.post(`${REACT_APP_API_URL}/auth/local`, {
+      //   identifier: name,
+      //   password: password,
+      // })
+      // .then(
+      //   (response)=>{
+      //     console.log(response.data)
+      //     if(response.data.user.roles==='Vmixadmin'){
                routerCtx.history.push( '/upload' )
-          }else{
-            setOpen(true)
-          }
+      //     }else{
+      //       setOpen(true)
+      //     }
         
-        }
-      )
-      .catch(
+      //   }
+      // )
+      // .catch(
   
-      );
-      return 
+      // );
+      // return 
     }
   
      
@@ -227,7 +227,7 @@ export default function IndexCard () {
 
   useEffect(()=>{
     createToken();
-  })
+  },[])
 
   const getResourceId =async()=>{
    
@@ -286,8 +286,27 @@ export default function IndexCard () {
     
     // Build token with uid
     const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
-    const saveToken = async() =>{ localStorage.setItem("token",tokenA)}
-    console.log(tokenA)
+    const saveToken = async() =>{ 
+      let bod={
+        token:tokenA
+      }
+      localStorage.setItem("token",tokenA);
+      let body=JSON.stringify(bod)
+      await fetch(`${REACT_APP_API_URL}/api/token/`, {
+        method: 'PUT',
+        headers: {
+             
+            'Content-Type': 'application/json',
+        },
+       body:body
+      }).then((response)=>{
+        console.log('succeeded',response)
+      }).catch((error)=>{
+        console.log('failed',error.message)
+      })
+    }
+    saveToken()
+    console.log('yh',tokenA)
     setToke(tokenA)
     const c = async()=> {await send(tokenA)}
     c();

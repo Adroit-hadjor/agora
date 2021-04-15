@@ -2,7 +2,7 @@
 
 
 export const Store = async(name,value)=>{
-    const values = await localStorage.setItem(name,value);
+    await localStorage.setItem(name,value);
     
 }
 export const Get = async(name)=>{
@@ -11,6 +11,6 @@ export const Get = async(name)=>{
 }
 
 export const Remove = async(name)=>{
-    const values = await localStorage.setItem(name,"");
+    await localStorage.setItem(name,"");
   
 }

@@ -1,11 +1,12 @@
 import AgoraRTC from 'agora-rtc-sdk'
 import EventEmitter from 'events'
-const appID = process.env.REACT_APP_AGORA_APP_ID
+const appID = 'c40594061e1f4580aae3b2af1963d01e'
 console.log(
   'agora sdk version: ' +
     AgoraRTC.VERSION +
     ' compatible: ' +
-    AgoraRTC.checkSystemRequirements()
+    AgoraRTC.checkSystemRequirements()+
+' app id is'+appID
 )
 export default class RTCClient {
   constructor () {

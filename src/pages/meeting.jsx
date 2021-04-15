@@ -24,9 +24,8 @@ import ScrollToBottom ,{useScrollToBottom,useSticky}from 'react-scroll-to-bottom
 import ScrollableFeed from 'react-scrollable-feed'
 import { Button } from '@material-ui/core'
 import { TvRounded } from '@material-ui/icons'
+import {REACT_APP_API_URL} from './../api'
 
-const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
-const socket = io(STRAPI_ENDPOINT);
 
 const useStyles = makeStyles({
   menu: {
@@ -121,41 +120,41 @@ const MeetingPage = () => {
   
 
   const [opacity,setOpacity]=useState(true)
-useEffect(()=>{
-  socket.on('chat message', (ch)=> {
-
-    if(Object.keys(ch).length>0){
-     setm(ch)
-    }
+// useEffect(()=>{
+//   socket.on('chat message', (ch)=> {
+//     console.log(ch)
+//     if(Object.keys(ch).length>0){
+//      setm(ch)
+//     }
   
-    /* if(messages.length > 6){
-      setMessages([])
-    } */
+//     /* if(messages.length > 6){
+//       setMessages([])
+//     } */
       
     
-     })
-     return () => {
-      socket.off("chat message");
-    };
-},[count])
-useEffect(()=>{
+//      })
+//      return () => {
+//       socket.off("chat message");
+//     };
+// },[count])
+// useEffect(()=>{
 
-socket.on('fire', (ch)=> {
+// socket.on('fire', (ch)=> {
 
      
     
-     setf()
+//      setf()
     
     
-     })
-     return () => {
-      socket.off("chat message");
-    };
-},[counter])
+//      })
+//      return () => {
+//       socket.off("chat message");
+//     };
+// },[counter])
 
 const send = async()=>{
   const t ="21221"
-  const url = "tokens/1"
+  const url = "api/token"
   console.log("step 1")
   const body = {
      token:t
@@ -302,9 +301,6 @@ const shutdown = () =>{
 
 
   const config = useMemo(() => {
-
-   
-    
     return {
       token: stateCtx.config.token,
       channel: "casa",
@@ -315,12 +311,34 @@ const shutdown = () =>{
       muteAudio: muteAudio,
       uid: "0",
       host: stateCtx.config.host
-      // beauty: stateCtx.beauty
+      
     }
   }, [stateCtx, muteVideo, muteAudio])
 
 
   
+  useEffect(() => {
+    if (
+      config.channel &&
+      localClient._created &&
+      localClient._joined === false
+    ) {
+      localClient
+        .join(config)
+        .then((uid) => {
+          if (config.host) {
+            localClient.publish()
+          }
+          mutationCtx.updateConfig({ uid })
+          mutationCtx.stopLoading()
+        })
+        .catch((err) => {
+          alert('Error is here')
+          // mutationCtx.toastError(`Media ${err.info}`)
+           routerCtx.history.push('/')
+        })
+    }
+  }, [localClient, mutationCtx, config, routerCtx])
 
 
 
@@ -343,28 +361,7 @@ const shutdown = () =>{
     }
   }, [config.channel, history, params])
 
-  useEffect(() => {
-    if (
-      config.channel &&
-      localClient._created &&
-      localClient._joined === false
-    ) {
-      localClient
-        .join(config)
-        .then((uid) => {
-          if (config.host) {
-            localClient.publish()
-          }
-          mutationCtx.updateConfig({ uid })
-          mutationCtx.stopLoading()
-        })
-        .catch((err) => {
-          mutationCtx.toastError(`Media ${err.info}`)
-          routerCtx.history.push('/')
-        })
-    }
-  }, [localClient, mutationCtx, config, routerCtx])
-
+  
   const handleClick = (name) => {
     return (evt) => {
       evt.stopPropagation()
@@ -450,8 +447,8 @@ const shutdown = () =>{
           <Tooltip title="quit">
             <div
               className="quit"
-              onClick={() => { 
-                   recordWebcam.download();
+              onClick={ async() => { 
+                   await recordWebcam.download();
                    recordWebcam.close();
                    send();
                    localClient.leave().then(() => {

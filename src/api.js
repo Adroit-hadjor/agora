@@ -1,7 +1,7 @@
-const REACT_APP_API_URL= 'http://18.188.190.182:1337'
+
+export  const REACT_APP_API_URL='https://us-central1-samtv-7b912.cloudfunctions.net/app'
 
 export const Post = async(url,body,token) => {
-  const link = `${REACT_APP_API_URL}` + '/' + url;
   body=JSON.stringify(body)
   if (token){
     token = JSON.parse(token);
@@ -56,7 +56,7 @@ export const Post = async(url,body,token) => {
 }
 
 export const Put = async(url,body,token) => {
-   const link = `${REACT_APP_API_URL}` + '/' + url;
+   
    body=JSON.stringify(body)
    if (token){
      token = JSON.parse(token);
@@ -111,7 +111,7 @@ export const Put = async(url,body,token) => {
  }
 
 export const PostWithImage = async(url,body,token,img) => {
-   const link = `${REACT_APP_API_URL}` + '/' + url;
+   
    body=JSON.stringify(body)
    if (token){
      token = JSON.parse(token);
@@ -168,7 +168,7 @@ export const PostWithImage = async(url,body,token,img) => {
 
 
 export const Get = async(url,token) => {
-  const link = `${REACT_APP_API_URL}` + '/' + url;
+  
   
   if (token){
     

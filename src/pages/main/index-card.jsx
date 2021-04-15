@@ -179,13 +179,13 @@ export default function IndexCard () {
 
   const getResourceId =async()=>{
    
-    const cust_id ="98b9f5d2847a4605a8ab0a401993a750"
+    const custId ="98b9f5d2847a4605a8ab0a401993a750"
     const secret ="0dade57ed94546f4abf8d0b040a84723"
-    const stringer = cust_id +":"+secret
+    const stringer = custId +":"+secret
     const encodedCredential = Buffer.from(stringer).toString('base64')
     const Authorization = "Basic " + encodedCredential
 
-    const appID = process.env.REACT_APP_AGORA_APP_ID;
+    const appID = 'c40594061e1f4580aae3b2af1963d01e';
     console.log(" resourcebraaaaaaaaaaa ")
     const acquire = await axios.post(
       `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,

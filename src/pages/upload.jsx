@@ -1,16 +1,15 @@
 import React, {useState, useEffect } from 'react'
 import { useGlobalState, useGlobalMutation } from '../utils/container'
 import { makeStyles } from '@material-ui/core/styles'
-import { Container } from '@material-ui/core'
-import IndexCard from './index/mycard'
+// import { Container } from '@material-ui/core'
+// import IndexCard from './index/mycard'
 import axios from 'axios'
-import io from "socket.io-client";
-
+import {REACT_APP_API_URL} from './../api'
+import firebase from './../firebase'
 import Button from '@material-ui/core/Button'
 
-const STRAPI_ENDPOINT = 'http://18.188.190.182:1337/';
-const socket = io(STRAPI_ENDPOINT);
 
+const youtubeID='vhSTUUaBn2eLfp41ZhZm'
 const useStyles = makeStyles(() => ({
   container: {
     height: '100%',
@@ -22,48 +21,48 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'center'
   }
 }))
-const Data = [
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  },
-  {
-    title:"das",
-    url:"fdfdfdf"
-  }
-]
+// const Data = [
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   },
+//   {
+//     title:"das",
+//     url:"fdfdfdf"
+//   }
+// ]
 
 const Upload = () => {
   const stateCtx = useGlobalState()
@@ -72,7 +71,8 @@ const Upload = () => {
   const [youtube,setYoutube]=useState('')
   const [video,setVideo]=useState(null)
   const [allVids,setAllVids]=useState([])
-  const classes = useStyles()
+  const [url,setUrl]=useState('')
+  // const classes = useStyles()
 
   useEffect(() => {
     if (stateCtx.loading === true) {
@@ -80,11 +80,6 @@ const Upload = () => {
     }
   }, [stateCtx.loading, mutationCtx])
 
-  useEffect(()=>{
-    socket.on('start',(start)=>{
-      console.log(start)
-    })
-  },[])
 
   const YSubmit=async(e)=>{
     e.preventDefault();
@@ -93,77 +88,90 @@ const Upload = () => {
     }
     
     var body=JSON.stringify(bo)
-    const response = await fetch(`http://18.188.190.182:1337/youtubes/`+1, {
+    await fetch(`${REACT_APP_API_URL}/api/update/`+`${youtubeID}`, {
       method: 'PUT',
       headers: {
            
           'Content-Type': 'application/json',
       },
      body:body
+    }).then((response)=>{
+      console.log('succeeded',response)
+    }).catch((error)=>{
+      console.log('failed',error.message)
     })
+    
 
   }
   const Submit=async (e)=>{
 
     e.preventDefault();
-    var bo={
-      title:videoText
-    }
+
     
-    var body=JSON.stringify(bo)
-    const response = await fetch(`http://18.188.190.182:1337/videos/`, {
-      method: 'POST',
-      headers: {
-           
-          'Content-Type': 'application/json',
-      },
-     body:body
+    console.log(video.name)
+   var storageRef=firebase.storage().ref('videos/'+video.name)
+   await storageRef.put(video).then((response)=>{
+     console.log('Done',response)
+   }).then(()=>{
+     const getDUrl= async ()=>{
+      var dUrl=await firebase.storage().ref('videos/'+video.name).getDownloadURL()
+      console.log(dUrl)
+      setUrl(dUrl)
+      let bod={
+        title:videoText,
+        url:dUrl
+      }
+      let body=JSON.stringify(bod)
+      await fetch(`${REACT_APP_API_URL}/api/createVideo/`, {
+        method: 'PUT',
+        headers: {
+             
+            'Content-Type': 'application/json',
+        },
+       body:body
+      }).then((response)=>{
+        console.log('succeeded',response)
+      }).catch((error)=>{
+        console.log('failed',error.message)
+      })
+     }
+    getDUrl()
+
    })
-   if(response.ok){
-     console.log('Je Suis')
-    const data = await response.json()
-    console.log(data)
-    const num = data.id
-   
-if(data.id > 0){
-    const sena = async()=>{
-    console.log("step 4")
-    console.log(video)
-    const formData = new FormData();
-    formData.append('files', video) // optional, you need it if you want to link the image to an entry
-    formData.append('ref', 'videos') 
-    formData.append('refId', data.id) // optional, you need it if you want to link the image to an entry
-    formData.append('field', 'video') // optional, you need it if you want to link the image to an entry
-    //data.append('source', 'users-permissions');y
-      console.log(formData)
-     const ss = await axios.post('http://18.188.190.182:1337/upload', formData , {headers: {'Content-Type': 'multipart/form-data'}}) 
-   
-    }
-
-    sena();
-   }
-   }
-  
-
-               
-                // console.log(video,videoText)
+  //     const formData = new FormData();
+  //     formData.append('file', video) // optional, you need it if you want to link the image to an entry
+  //   //  formData.append('ref', 'video') 
+  //   //   formData.append('refId', data.id) // optional, you need it if you want to link the image to an entry
+  //   //    formData.append('field', 'video') 
+  //   await axios.post(`${REACT_APP_API_URL}/upload`, formData, {
+  //     headers: {
+  //         "Content-Type": "multipart/form-data"
+  //     }
+  // }).then((response)=>{
+  //       console.log('Sent',response)
+  //     }).catch((error)=>{
+  //         console.log('The error',error.message);
+  //     })
+      
+  //   }
+  // }
   }
 
-  useEffect(()=>{
-    const fetchVideos=async()=>{
-      await axios.get('http://18.188.190.182:1337/videos').then((response)=>{
-        if(response){
-            setAllVids(response.data)
-            console.log(response.data)
-        }
-      }).catch(
-        (error)=>{
-            console.log(error)
-        }
-      )
-    }
-    fetchVideos()
-  },[])
+  // useEffect(()=>{
+  //   const fetchVideos=async()=>{
+  //     await axios.get(`${REACT_APP_API_URL}/videos`).then((response)=>{
+  //       if(response){
+  //           setAllVids(response.data)
+  //           console.log(response.data)
+  //       }
+  //     }).catch(
+  //       (error)=>{
+  //           console.log(error)
+  //       }
+  //     )
+  //   }
+  //   fetchVideos()
+  // },[])
 
 
   return (
@@ -181,13 +189,13 @@ if(data.id > 0){
    @ {vids.title}
  </text>
    <text>
-{vids.video.url}
+{vids.video?.url}
           
    </text>
 </div>
 <Button 
 onClick={async ()=>{
-  await axios.delete('http://18.188.190.182:1337/videos/'+vids.id)
+  await axios.delete(`${REACT_APP_API_URL}/videos/`+vids.id)
   .then((res)=>{
     if(res){
       window.location.href='/upload'
@@ -206,7 +214,7 @@ style={{width:"20%",height:"auto",borderRadius:10,padding:10,display:"flex",flex
  }) }
          </div>
         </div>
-        <div  style={{display:"flex",flexDirection:'column',alignItems:'center',justifyContent:'center',width:"50%",height:"100%",borderLeft:"1px solid gainsboro",justifyContent:"center",alignItems:"center"}}>
+        <div  style={{display:"flex",flexDirection:'column',width:"50%",height:"100%",borderLeft:"1px solid gainsboro",justifyContent:"center",alignItems:"center"}}>
         <div style={{display:"flex",flexDirection:"column",width:"300px",padding:10,justifyContent:"start",height:"100px"}}>
         <span style={{display:'block', textAlign:'center',fontSize:18,fontWeight:'500',marginBottom:15,}}>Upload Youtube Live Link</span>
 
